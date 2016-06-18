@@ -25,3 +25,52 @@ This is a simple vault for cookie-secrets that can be used in DTLS handshake pro
 >handshake through the transition (e.g., they received a cookie with
 >Secret 1 and then sent the second ClientHello after the server has
 >changed to Secret 2)
+
+---
+
+API:
+```c
+//Maximum amount of secrets our vault can hold
+#define CK_SECRET_MAX 20
+
+//Length of a secret
+#define CK_SECRET_LENGTH 16
+
+//Storage of secrets
+unsigned char ck_secrets_vault[CK_SECRET_MAX][CK_SECRET_LENGTH]; 
+
+ //Pick a random secret
+unsigned char *ck_secrets_random();
+
+//Generate an amount of secrets
+int ck_secrets_generate(int amount); 
+
+//Count secrets inside vault
+int ck_secrets_count();
+
+//Check whether secret for a cookie exist (matches)
+int ck_secrets_exist(unsigned char* peer, unsigned int peer_len, unsigned char *cookie, unsigned int cookie_len);
+```
+
+Generate 20 secrets:
+```c
+printf("Generated %d cookie-secrets.\n", ck_secrets_generate(20));
+```
+
+
+Generate a cookie with a random secret:
+```c
+HMAC(EVP_sha256(), (const void*) ck_secrets_random(), CK_SECRET_LENGTH,
+        (const unsigned char*) buffer, length, result, &resultlength);
+```
+
+Test whether cookie matches one of our secrets:
+```c
+if(ck_secrets_exist(buffer, length, cookie, cookie_len) == 1)
+   //exists
+else
+   //negative
+```
+
+
+Credits to Robin Seggelmann &  Michael Tuexen for their HMAC-generation snippet.
