@@ -1,5 +1,5 @@
 /*
- * Copyright (C)      - 2016 Steven Agyekum, s-8@posteo.mx
+ * Copyright (C) 2016 - 2017 Steven Agyekum, s-8@posteo.mx
  * Copyright (C) 2009 - 2012 Robin Seggelmann, seggelmann@fh-muenster.de,
  *                           Michael Tuexen, tuexen@fh-muenster.de
  *
@@ -61,6 +61,8 @@ int ck_secrets_exist(unsigned char* peer, unsigned int peer_len, unsigned char *
     for(i = 0; i < ck_secrets_count(); i++) {
 
         unsigned char result[EVP_MAX_MD_SIZE];
+        memset( &result, 0, sizeof( result ) );
+
         unsigned int result_len;
         
         HMAC(EVP_sha256(), (const void*) ck_secrets_vault[i], CK_SECRET_LENGTH,
