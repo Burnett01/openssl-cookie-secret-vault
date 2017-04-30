@@ -1,5 +1,5 @@
 # openssl-cookie-secret-vault
-This is a simple vault for cookie-secrets that can be used in DTLS handshake procedure (HelloVerifyRequest) as described in RFC6347
+A simple vault for storing cookie secrets, to be used while generating and verifying a cookie during the DTLS handshake procedure (HelloVerifyRequest, RFC6347).
 
 >The DTLS server SHOULD generate cookies in such a way that they can
 >be verified without retaining any per-client state on the server.
@@ -26,51 +26,67 @@ This is a simple vault for cookie-secrets that can be used in DTLS handshake pro
 >Secret 1 and then sent the second ClientHello after the server has
 >changed to Secret 2)
 
+RFC: https://tools.ietf.org/html/rfc6347
+
+Instead of storing cookies or using the same secret over and over again, we simply generate a specific amount of secrets, store them inside a vault and randomly pick one upon cookie-creation.
+Later then we match the cookie against our secrets in that vault.
+
 ---
 
 API:
 ```c
-//Maximum amount of secrets our vault can hold
 #define CK_SECRET_MAX 20
-
-//Length of a secret
 #define CK_SECRET_LENGTH 16
 
-//Storage of secrets
-unsigned char ck_secrets_vault[CK_SECRET_MAX][CK_SECRET_LENGTH]; 
+/*
+Vault that contains the secrets 
+*/
+unsigned char ck_secrets_vault[CK_SECRET_MAX][CK_SECRET_LENGTH];
 
- //Pick a random secret
-unsigned char *ck_secrets_random();
+/*
+Picks a random secret off the vault
+*/
+unsigned char *ck_secrets_random( void );
 
-//Generate an amount of secrets
-int ck_secrets_generate(int amount); 
+/*
+Returns the amount of secrets in the vault
+*/
+unsigned int ck_secrets_count( void );
 
-//Count secrets inside vault
-int ck_secrets_count();
+/*
+Creates and stores an amount of secrets
+into the vault
+*/
+int ck_secrets_generate( unsigned int amount );
 
-//Check whether secret for a cookie exist (matches)
-int ck_secrets_exist(unsigned char* peer, unsigned int peer_len, unsigned char *cookie, unsigned int cookie_len);
+/*
+Tests whether cookie matches on of the secrets
+in the vault
+*/
+int ck_secrets_exist( unsigned char* peer, unsigned int plen, 
+        unsigned char *cookie, unsigned int clen );
 ```
 
 Generate 20 secrets:
 ```c
-printf("Generated %d cookie-secrets.\n", ck_secrets_generate(20));
+printf( "Generated %d cookie-secrets.\n", ck_secrets_generate( 20 ) );
 ```
 
 
 Generate a cookie with a random secret:
 ```c
-HMAC(EVP_sha256(), (const void*) ck_secrets_random(), CK_SECRET_LENGTH,
-        (const unsigned char*) buffer, length, result, &resultlength);
+HMAC( EVP_sha256(), (const void*)ck_secrets_random(), CK_SECRET_LENGTH,
+        (const unsigned char*)buff, bufflen, result, &reslen );
 ```
 
 Test whether cookie matches one of our secrets:
 ```c
-if(ck_secrets_exist(buffer, length, cookie, cookie_len) == 1)
-   //exists
+if( ck_secrets_exist( buff, bufflen, cookie, clen ) == 1)
+   /* Cookie is valid since we found a matching secret */
 else
-   //negative
+   /* Cookie is not valid */
 ```
 
+---
 
 Credits to Robin Seggelmann &  Michael Tuexen for their HMAC-generation snippet.
