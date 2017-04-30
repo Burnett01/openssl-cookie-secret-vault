@@ -30,52 +30,76 @@
  * SUCH DAMAGE.
  */
 
+#include <openssl/crypto.h>
+#include <openssl/rand.h>
+#include <openssl/evp.h>
+
 #include "ck_secrets_vault.h"
 
 
-int ck_secrets_generate(int amount) {
+/*
+Picks a random secret off the vault
+*/
+unsigned char *ck_secrets_random( void )
+{
+    unsigned int count = ck_secrets_count();
+
+    return ( count > 0 ) ? ck_secrets_vault[rand() % count] : NULL;
+}
+
+/*
+Returns the amount of secrets in the vault
+*/
+unsigned int ck_secrets_count( void )
+{
+    return ( sizeof( ck_secrets_vault ) / sizeof( ck_secrets_vault[0] ) );
+}
+
+/*
+Creates and stores an amount of secrets
+into the vault
+*/
+int ck_secrets_generate( unsigned int amount )
+{
     int i = 0;
 
     do {
-        if(amount <= 0 
+        if( amount <= 0 
             || amount > CK_SECRET_MAX 
-            || !RAND_bytes(ck_secrets_vault[i], CK_SECRET_LENGTH))
+            || !RAND_bytes( ck_secrets_vault[i], CK_SECRET_LENGTH ) )
             break;
         i++;
-    } while(i < amount);
+    } while( i < amount );
 
     return i;
 }
 
-int ck_secrets_count() {
-    return sizeof(ck_secrets_vault)/sizeof(ck_secrets_vault[0]);
-}
-
-unsigned char *ck_secrets_random() {
-    return (ck_secrets_count() > 0) ? ck_secrets_vault[rand() % ck_secrets_count()] : NULL;
-}
-
-int ck_secrets_exist(unsigned char* peer, unsigned int peer_len, unsigned char *cookie, unsigned int cookie_len) {
+/*
+Tests whether cookie matches on of the secrets
+in the vault
+*/
+int ck_secrets_exist( unsigned char* peer, unsigned int plen, 
+            unsigned char *cookie, unsigned int clen )
+{
     int i, success = 0;
+    unsigned char result[EVP_MAX_MD_SIZE];
+    unsigned int reslen = 0, count = ck_secrets_count();
 
-    for(i = 0; i < ck_secrets_count(); i++) {
-
-        unsigned char result[EVP_MAX_MD_SIZE];
+    for( i = 0; i < ( !count ) ? 0 : count; i++ )
+    {
         memset( &result, 0, sizeof( result ) );
-
-        unsigned int result_len;
         
-        HMAC(EVP_sha256(), (const void*) ck_secrets_vault[i], CK_SECRET_LENGTH,
-        (const unsigned char*) peer, peer_len, result, &result_len);
+        HMAC( EVP_sha256(), (const void*)ck_secrets_vault[i], CK_SECRET_LENGTH,
+        (const unsigned char*)peer, plen, result, &reslen );
 
-        if (cookie_len == result_len && memcmp(result, cookie, result_len) == 0)
-            goto found;
-        
+        if( clen == reslen && memcmp( result, cookie, reslen ) == 0 )
+        {
+            success = 1;
+            break;
+        }
     }
-    
-    found:
-        success = 1;
-    
-    OPENSSL_free(peer);
+
+    OPENSSL_free( peer );
+
     return success;
 }
