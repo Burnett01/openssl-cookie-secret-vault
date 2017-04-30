@@ -99,7 +99,5 @@ int ck_secrets_exist( unsigned char* peer, unsigned int plen,
         }
     }
 
-    OPENSSL_free( peer );
-
     return success;
 }
