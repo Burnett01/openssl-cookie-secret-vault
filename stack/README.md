@@ -13,7 +13,7 @@ API:
 /*
 Vault that contains the secrets 
 */
-static unsigned char ck_secrets_vault[CK_SECRET_MAX][CK_SECRET_LENGTH];
+static unsigned char ck_secrets_vault[CK_SECRET_MAX][CK_SECRET_LEN];
 
 /*
 Creates and stores an amount of secrets
