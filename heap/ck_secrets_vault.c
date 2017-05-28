@@ -44,7 +44,7 @@ into the vault
 */
 Vault *vault_init( size_t amount )
 {
-    Vault *v = malloc( sizeof( struct vault ) );
+    Vault *v = malloc( sizeof( Vault ) );
 
     assert( v != NULL );
 
