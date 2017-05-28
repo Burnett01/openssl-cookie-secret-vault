@@ -45,7 +45,7 @@ extern "C" {
 /*
 Vault that contains the secrets 
 */
-typedef Vault Vault;
+typedef struct Vault Vault;
 
 struct Vault
 {
