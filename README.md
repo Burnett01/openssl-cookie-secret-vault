@@ -1,6 +1,6 @@
 # openssl-cookie-secret-vault
 
-A simple vault for storing cookie secrets, to be used while generating and verifying a cookie during the DTLS handshake procedure (HelloVerifyRequest, RFC6347).
+A simple vault for storing cookie secrets that can be used while generating and verifying a cookie during the DTLS handshake procedure (HelloVerifyRequest, RFC6347).
 
 >The DTLS server SHOULD generate cookies in such a way that they can
 >be verified without retaining any per-client state on the server.
