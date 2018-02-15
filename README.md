@@ -46,4 +46,12 @@ Two versions namely stack and heap are included.
 
 #### Heap version: [Here](../master/heap/)
 
+---
 
+Requirements:
+
+```c
+#include <openssl/crypto.h>
+#include <openssl/rand.h>
+#include <openssl/evp.h>
+```
