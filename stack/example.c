@@ -30,6 +30,8 @@
  * SUCH DAMAGE.
  */
 
+#include "ck_secrets_vault.h"
+
 /* All of this is pseudo code though it's pretty straightforward */
 
 int main( int argc, char **argv )
