@@ -36,6 +36,9 @@ RFC: https://tools.ietf.org/html/rfc6347
 Instead of storing cookies or using the same secret over and over again, we simply generate a specific amount of secrets, store them inside a vault and randomly pick one upon cookie-creation.
 Later then we match the cookie against our secrets in that vault.
 
+**Please note:** This solution does not reflect the most appropiate way as described in RFC 4347, where only 2 self-invalidating secrets should be used. My solution should therefor only be looked as a tool for implementing the RFC.<br>
+Thank's to Nathaniel J. Smith for clarifying this fact.
+
 ---
 
 ### Source code
