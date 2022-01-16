@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - 2021 Steven Agyekum, s-8@posteo.mx
+ * Copyright (C) 2016 - 2022 Steven Agyekum, s-8@posteo.mx
  * Copyright (C) 2009 - 2012 Robin Seggelmann, seggelmann@fh-muenster.de,
  *                           Michael Tuexen, tuexen@fh-muenster.de
  *
